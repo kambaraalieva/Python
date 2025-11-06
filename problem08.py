@@ -1,7 +1,7 @@
 def to_bin_str(n: int, width: int = 0) -> str:
-    s = bin(n)[2:]  # убираем 0b
+    s = bin(n)[2:]  
     if width > 0:
-        s = s.zfill(width)  # добавляем ведущие нули
+        s = s.zfill(width)
     return s
 
 # Примеры
