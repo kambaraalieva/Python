@@ -1,0 +1,15 @@
+from bs4 import BeautifulSoup
+
+# Your HTML
+wiki = '''<div id="main-tfa" class="main-block main-box main-box-responsive-image"> ... </div>'''
+
+# Create a BeautifulSoup object
+soup = BeautifulSoup(wiki, 'html.parser')
+
+# Now you can use soup to find elements, for example:
+title = soup.find('a', title="Файф-о-клок").text
+print("Title:", title)
+
+# Example: get the main paragraph text
+paragraph = soup.find('div', class_='main-box-content').p.text
+print("Paragraph:", paragraph)
