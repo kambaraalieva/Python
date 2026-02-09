@@ -1,0 +1,105 @@
+﻿
+
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    full_name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE courses (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    level TEXT NOT NULL
+);
+
+CREATE TABLE students_courses (
+    students_id INTEGER,
+    courses_id INTEGER, 
+
+    FOREIGN KEY (students_id) REFERENCES students(id),
+    FOREIGN KEY (courses_id) REFERENCES courses(id)
+);
+
+INSERT INTO students (full_name, email) VALUES 
+('Sultan Talaibekov', 'tlbkvs@gmail.com'),
+('Tima Joroev', 'tima@gmail.com'),
+('Nick Grebnev', 'nick@gmail.com');
+
+
+INSERT INTO courses (title, level) VALUES 
+('python', 'A'),
+('js', 'B'),
+('PostgreSQL Basics', 'C');
+
+
+SELECT * FROM students
+SELECT * FROM courses
+
+INSERT INTO students_courses VALUES
+(1, 2),
+(2, 1),
+(3, 1);
+
+
+SELECT courses.title, students.full_name, students.email FROM courses 
+INNER JOIN students_courses ON courses.id = students_courses.courses_id
+INNER JOIN students ON students.id = students_courses.students_id; 
+
+
+
+-- Найти всех студентов, которые записаны на курс с названием «PostgreSQL Basics».
+
+SELECT students.full_name FROM students INNER JOIN students_courses 
+ON students.id = students_courses.students_id
+INNER JOIN courses 
+ON courses.id = students_courses.courses_id WHERE courses.title = 'PostgreSQL Basics';
+
+
+-- Для каждого курса вывести название курса и количество студентов, записанных на него.
+
+SELECT courses.title, COUNT(students.id) FROM courses 
+INNER JOIN students_courses
+ON courses.id = students_courses.courses_id
+INNER JOIN students
+ON students.id = students_courses.students_id 
+GROUP BY courses.title;
+
+
+-- Вывести все курсы, даже если на них ещё никто не записался, и указать количество студентов на каждом курсе.
+SELECT courses.title, COUNT(students) FROM courses 
+LEFT JOIN students_courses
+ON courses.id = students_courses.courses_id
+LEFT JOIN students
+ON students.id = students_courses.students_id 
+GROUP BY courses.title;
+
+
+-- Найти студентов, которые не записаны ни на один курс.
+SELECT 
+    students.full_name,
+    students.email
+FROM students
+LEFT JOIN students_courses
+    ON students.id = students_courses.students_id
+WHERE students_courses.students_id IS NULL;
+
+
+-- Найти курсы, на которые записано больше 3 студентов.
+SELECT courses.title, COUNT(students) FROM courses 
+LEFT JOIN students_courses
+ON courses.id = students_courses.courses_id
+LEFT JOIN students
+ON students.id = students_courses.students_id 
+GROUP BY courses.title
+HAVING COUNT(students.id) > 3;
+
+-- Найти студентов, которые записаны более чем на один курс, и вывести количество курсов для каждого такого студента.
+
+SELECT 
+    s.full_name,
+    COUNT(sc.courses_id) AS courses_count
+FROM students s
+INNER JOIN students_courses sc
+    ON s.id = sc.students_id
+GROUP BY s.full_name
+HAVING COUNT(sc.courses_id) > 1;
